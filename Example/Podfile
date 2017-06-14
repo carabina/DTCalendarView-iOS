@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'DTCalendarView_Example' do
+  pod 'DTCalendarView', :path => '../'
+
+  target 'DTCalendarView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
