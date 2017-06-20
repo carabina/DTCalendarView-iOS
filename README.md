@@ -2,6 +2,8 @@
 
 DTCalendarView is a library to present a vertical scrolling calendar. It supports single value and range selection and dragging of selected dates. The font and color of most items can be styled.
 
+![alt text](calendar.gif "Calendar View in Action")
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
