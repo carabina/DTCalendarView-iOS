@@ -23,7 +23,7 @@ It supports single value and range selection and dragging of selected dates.
 The font and color of most items can be styled.
                        DESC
 
-  s.homepage         = 'https://stash.dynamit.com/projects/MOB/repos/dtcalendarview/'
+  s.homepage         = 'https://stash.dynamit.com/projects/MOB/repos/dtcalendarview/browse'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Tim LeMaster' => 'tim@dynamit.com' }
