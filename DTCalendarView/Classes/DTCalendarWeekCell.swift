@@ -48,6 +48,8 @@ class DTCalendarWeekCell: UICollectionViewCell {
     }
     
     override func prepareForReuse() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         
         leadInSelectionView.isHidden = true
         leadOutSelectionView.isHidden = true
@@ -57,6 +59,8 @@ class DTCalendarWeekCell: UICollectionViewCell {
             dayView.isPreview = false
             dayView.isHidden = false
         }
+        
+        CATransaction.commit()
     }
     
     override func layoutSubviews() {
@@ -107,6 +111,9 @@ class DTCalendarWeekCell: UICollectionViewCell {
     }
     
     func updateCalendarLabels(weekDisplayAttributes: WeekDisplayAttributes) {
+        
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         
         backgroundColor = weekDisplayAttributes.normalDisplayAttributes.backgroundColor
         leadInSelectionView.backgroundColor = weekDisplayAttributes.highlightedDisplayAttributes.backgroundColor
@@ -192,6 +199,8 @@ class DTCalendarWeekCell: UICollectionViewCell {
                 }
             }
         }
+        
+        CATransaction.commit()
     }
     
     private func configure(calendarDayView: DTCalendarDayView,
