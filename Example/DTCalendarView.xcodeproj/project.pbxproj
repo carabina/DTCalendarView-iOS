@@ -29,8 +29,8 @@
 
 /* Begin PBXFileReference section */
 		2DC406DFA4E6047492C9AD94 /* Pods_DTCalendarView_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DTCalendarView_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		41F5DBEDAA2E1E0831F85977 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		53DB855D3C24B1D3463A07C7 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		41F5DBEDAA2E1E0831F85977 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		53DB855D3C24B1D3463A07C7 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* DTCalendarView_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DTCalendarView_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACD51AFB9204008FA782 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -42,7 +42,7 @@
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		7CD52AC42FC83772B95339B0 /* Pods-DTCalendarView_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DTCalendarView_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DTCalendarView_Tests/Pods-DTCalendarView_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		AC5D7EF7E4F4A62DD4B36571 /* DTCalendarView.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = DTCalendarView.podspec; path = ../DTCalendarView.podspec; sourceTree = "<group>"; };
+		AC5D7EF7E4F4A62DD4B36571 /* DTCalendarView.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = DTCalendarView.podspec; path = ../DTCalendarView.podspec; sourceTree = "<group>"; };
 		B44D46BFCB1C8A8E6ED2F3C3 /* Pods-DTCalendarView_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DTCalendarView_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DTCalendarView_Example/Pods-DTCalendarView_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		D8B96457D4928F0828FDCDB0 /* Pods_DTCalendarView_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DTCalendarView_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E70C0948D027BFEB3EF713D3 /* Pods-DTCalendarView_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DTCalendarView_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DTCalendarView_Tests/Pods-DTCalendarView_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -215,10 +215,12 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = EJ34GAY7Z6;
 						LastSwiftMigration = 0820;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = EJ34GAY7Z6;
 						LastSwiftMigration = 0820;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -496,6 +498,7 @@
 			baseConfigurationReference = B44D46BFCB1C8A8E6ED2F3C3 /* Pods-DTCalendarView_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = EJ34GAY7Z6;
 				INFOPLIST_FILE = DTCalendarView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -510,6 +513,7 @@
 			baseConfigurationReference = E73D1E76F275506A927F9A57 /* Pods-DTCalendarView_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = EJ34GAY7Z6;
 				INFOPLIST_FILE = DTCalendarView/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -523,6 +527,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E70C0948D027BFEB3EF713D3 /* Pods-DTCalendarView_Tests.debug.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = EJ34GAY7Z6;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -543,6 +548,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7CD52AC42FC83772B95339B0 /* Pods-DTCalendarView_Tests.release.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = EJ34GAY7Z6;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",

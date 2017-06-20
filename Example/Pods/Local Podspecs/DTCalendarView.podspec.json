@@ -1,0 +1,22 @@
+{
+  "name": "DTCalendarView",
+  "version": "0.1.0",
+  "summary": "A short description of DTCalendarView.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/timle8n1-dynamit/DTCalendarView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "timle8n1-dynamit": "tim@dynamit.com"
+  },
+  "source": {
+    "git": "https://github.com/timle8n1-dynamit/DTCalendarView.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "DTCalendarView/Classes/**/*"
+}

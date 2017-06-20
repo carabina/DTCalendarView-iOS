@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'DTCalendarView'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of DTCalendarView.'
+  s.summary          = 'A vertical scrolling calendar'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,25 +18,19 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+DTCalendarView is a library to present a vertical scrolling calendar.
+It supports single value and range selection and dragging of selected dates.
+The font and color of most items can be styled.
                        DESC
 
   s.homepage         = 'https://github.com/timle8n1-dynamit/DTCalendarView'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'timle8n1-dynamit' => 'tim@dynamit.com' }
+  s.author           = { 'Tim LeMaster' => 'tim@dynamit.com' }
   s.source           = { :git => 'https://github.com/timle8n1-dynamit/DTCalendarView.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '8.0'
 
   s.source_files = 'DTCalendarView/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'DTCalendarView' => ['DTCalendarView/Assets/*.png']
-  # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
 end
