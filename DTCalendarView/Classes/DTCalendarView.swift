@@ -87,6 +87,13 @@ public protocol DTCalendarViewDelegate: class {
 /// A structure for holding the various stylable attributes for various calendar states
 public struct DisplayAttributes {
     
+    public init(font: UIFont, textColor: UIColor, backgroundColor: UIColor, textAlignment: NSTextAlignment) {
+        self.font = font
+        self.textColor = textColor
+        self.backgroundColor = backgroundColor
+        self.textAlignment = textAlignment
+    }
+    
     /// The font used to render the day or weekday label
     let font: UIFont
     
