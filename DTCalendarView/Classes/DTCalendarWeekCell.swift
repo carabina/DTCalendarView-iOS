@@ -22,6 +22,8 @@ class DTCalendarWeekCell: UICollectionViewCell {
     var selectionStartDate: Date?
     var selectionEndDate: Date?
     
+    var previewDaysInPreviousAndMonth = true
+    
     weak var delegate: DTCalendarWeekCellDelegate?
     
     private var dayViews: [DTCalendarDayView] = [DTCalendarDayView(frame: .zero),
@@ -106,7 +108,9 @@ class DTCalendarWeekCell: UICollectionViewCell {
         if let dayLabel = tapGR.view as? DTCalendarDayView,
             tapGR.state == .recognized {
             
-            delegate?.calendarWeekCell(self, didTapDate: dayLabel.representedDate)
+            if (dayLabel.isPreview && previewDaysInPreviousAndMonth) || (!dayLabel.isPreview) {
+                delegate?.calendarWeekCell(self, didTapDate: dayLabel.representedDate)
+            }
         }
     }
     
@@ -153,9 +157,13 @@ class DTCalendarWeekCell: UICollectionViewCell {
                     
                     let indexWithOffset = index + ((displayWeek-1) * 7)
                     
+                    dayView.previewDaysInPreviousAndMonth = previewDaysInPreviousAndMonth
+                    
                     if (indexWithOffset >= (weekday - 1)) && (indexWithOffset < (range.count + weekday - 1)) {
                         
                         let currentDay = indexWithOffset - weekday + 2
+                        dayView.dayOfMonth = currentDay
+                        
                         if let currentDate = calendar.date(bySetting: .day, value: currentDay, of: firstDayOfMonth) {
                             let startCurrentDate = calendar.startOfDay(for: currentDate)
                             
@@ -166,9 +174,12 @@ class DTCalendarWeekCell: UICollectionViewCell {
                                       andSelectionEndDateMidnight: selectionEndDateMidnight)
                         }
                         
-                        dayView.dayOfMonth = currentDay
                     } else if indexWithOffset >= (range.count + weekday - 1) {
+                        
                         let currentDay = indexWithOffset - range.count - weekday + 2
+                        dayView.isPreview = true
+                        dayView.dayOfMonth = currentDay
+                        
                         if let currentDate = calendar.date(bySetting: .day, value: currentDay, of: nextMonth) {
                             let startCurrentDate = calendar.startOfDay(for: currentDate)
                             
@@ -178,10 +189,12 @@ class DTCalendarWeekCell: UICollectionViewCell {
                                       forSelectionStartDateMidnight: selectionStartDateMidnight,
                                       andSelectionEndDateMidnight: selectionEndDateMidnight)
                         }
+                    } else {
+
+                        let currentDay = previousMonthRange.count - weekday + indexWithOffset + 2
                         dayView.isPreview = true
                         dayView.dayOfMonth = currentDay
-                    } else {
-                        let currentDay = previousMonthRange.count - weekday + indexWithOffset + 2
+                        
                         if let currentDate = calendar.date(bySetting: .day, value: currentDay, of: previousMonth) {
                             let startCurrentDate = calendar.startOfDay(for: currentDate)
                             
@@ -192,8 +205,6 @@ class DTCalendarWeekCell: UICollectionViewCell {
                                       forSelectionStartDateMidnight: selectionStartDateMidnight,
                                       andSelectionEndDateMidnight: selectionEndDateMidnight)
                         }
-                        dayView.isPreview = true
-                        dayView.dayOfMonth = currentDay
                     }
                     dayView.updateView(weekDisplayAttributes: weekDisplayAttributes)
                 }
@@ -218,7 +229,9 @@ class DTCalendarWeekCell: UICollectionViewCell {
                     calendarDayView.rangeSelection = .startSelectionNoEnd
                 } else {
                     if index == 6 {
-                        leadOutSelectionView.isHidden = false
+                        if (calendarDayView.isPreview && previewDaysInPreviousAndMonth) || (!calendarDayView.isPreview) {
+                            leadOutSelectionView.isHidden = false
+                        }
                     }
                     calendarDayView.rangeSelection = .startSelection
                 }
@@ -232,7 +245,9 @@ class DTCalendarWeekCell: UICollectionViewCell {
                     calendarDayView.rangeSelection = .endSelectionNoStart
                 } else {
                     if index == 0 {
-                        leadInSelectionView.isHidden = false
+                        if (calendarDayView.isPreview && previewDaysInPreviousAndMonth) || (!calendarDayView.isPreview) {
+                            leadInSelectionView.isHidden = false
+                        }
                     }
                     calendarDayView.rangeSelection = .endSelection
                 }
@@ -245,10 +260,14 @@ class DTCalendarWeekCell: UICollectionViewCell {
             if selectionStartDateMidnight < startOfDay && startOfDay < selectionEndDateMidnight {
                 clearRangeSelection = false
                 if index == 0 {
-                    leadInSelectionView.isHidden = false
+                    if (calendarDayView.isPreview && previewDaysInPreviousAndMonth) || (!calendarDayView.isPreview) {
+                        leadInSelectionView.isHidden = false
+                    }
                 }
                 if index == 6 {
-                    leadOutSelectionView.isHidden = false
+                    if (calendarDayView.isPreview && previewDaysInPreviousAndMonth) || (!calendarDayView.isPreview) {
+                        leadOutSelectionView.isHidden = false
+                    }
                 }
                 calendarDayView.rangeSelection = .inSelection
             }

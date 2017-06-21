@@ -22,6 +22,7 @@ class DTCalendarDayView: UIView {
     var rangeSelection: CalendarRangeSelection = .outSelection
     var dayOfMonth: Int = 1
     var isPreview = false
+    var previewDaysInPreviousAndMonth = true
     
     var representedDate = Date()
     
@@ -79,8 +80,17 @@ class DTCalendarDayView: UIView {
     
     func updateView(weekDisplayAttributes: WeekDisplayAttributes) {
         
-        dayLabel.text = "\(dayOfMonth)"
         backgroundColor = weekDisplayAttributes.normalDisplayAttributes.backgroundColor
+        
+        if isPreview && !previewDaysInPreviousAndMonth {
+            dayLabel.isHidden = true
+            selectedLayer.isHidden = true
+            highLightLayer.isHidden = true
+            return
+        }
+        
+        dayLabel.text = "\(dayOfMonth)"
+        dayLabel.isHidden = false
         
         switch rangeSelection {
         case .startSelection:

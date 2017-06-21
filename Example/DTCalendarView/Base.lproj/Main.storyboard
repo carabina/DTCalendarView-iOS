@@ -23,10 +23,10 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4yM-Ee-NJu" customClass="DTCalendarView" customModule="DTCalendarView">
-                                <rect key="frame" x="0.0" y="146" width="375" height="375"/>
+                                <rect key="frame" x="0.0" y="128" width="375" height="412.5"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="4yM-Ee-NJu" secondAttribute="height" multiplier="1:1" id="AvR-wV-nAn"/>
+                                    <constraint firstAttribute="width" secondItem="4yM-Ee-NJu" secondAttribute="height" multiplier="1:1.1" id="AvR-wV-nAn"/>
                                 </constraints>
                             </view>
                         </subviews>

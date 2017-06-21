@@ -184,6 +184,14 @@ public class DTCalendarView: UIControl {
         }
     }
     
+    /// Should the calendar scroll be paginated and always lock to the top of a month
+    public var paginateMonths = true {
+        didSet {
+            collectionViewSectionInsetSet = false
+            setNeedsLayout()
+        }
+    }
+    
     /// A delegate to provide required data to the calendar view and respond to user interaction with the calendar view
     public weak var delegate: DTCalendarViewDelegate?
     
@@ -221,6 +229,10 @@ public class DTCalendarView: UIControl {
     
     fileprivate var datePanGR: UIPanGestureRecognizer?
     fileprivate var panMode = PanMode.none
+    
+    fileprivate var sectionAtStartOfScrolling: Int?
+    fileprivate var pageSize: CGFloat = 0
+    fileprivate var collectionViewSectionInsetSet = false
     
     private var _startDate: Date = {
         let calendar = Calendar.current
@@ -296,6 +308,24 @@ public class DTCalendarView: UIControl {
         
         collectionView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height)
         
+        if !collectionViewSectionInsetSet {
+            collectionViewSectionInsetSet = true
+            
+            if paginateMonths {
+                let monthHeight = delegate?.calendarView(self, heightOfViewForMonth: displayStartDate) ?? 60
+                var height = monthHeight
+                height += delegate?.calendarViewHeightOfWeekdayLabelRow(self) ?? 50
+                height += (delegate?.calendarViewHeightOfWeekRows(self) ?? 40) * 6
+                
+                let bottomInset = max(collectionView.frame.size.height - (height + monthHeight), 0)
+            
+                pageSize = height + bottomInset
+                collectionViewFlowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: bottomInset, right: 0)
+            } else {
+                collectionViewFlowLayout.sectionInset = .zero
+            }
+        }
+        
         super.layoutSubviews()
     }
     
@@ -319,6 +349,7 @@ public class DTCalendarView: UIControl {
         
         switch state {
         case .normal:
+            collectionView.backgroundColor = displayAttributes.backgroundColor
             normalDisplayAttributes = displayAttributes
         case .selected:
             selectedDisplayAttributes = displayAttributes
@@ -349,6 +380,7 @@ public class DTCalendarView: UIControl {
         collectionViewFlowLayout.minimumLineSpacing = 0.0
         collectionViewFlowLayout.minimumInteritemSpacing = 0.0
         
+        collectionView.backgroundColor = weekDisplayAttributes.normalDisplayAttributes.backgroundColor
         
         collectionView.register(DTMonthViewCell.self, forCellWithReuseIdentifier: "MonthViewCell")
         collectionView.register(DTWeekdayViewCell.self, forCellWithReuseIdentifier: "WeekDayViewCell")
@@ -368,6 +400,10 @@ public class DTCalendarView: UIControl {
         let point = panGR.location(in: collectionView)
         
         if let dayView = collectionView.hitTest(point, with: nil) as? DTCalendarDayView {
+            
+            if dayView.isPreview && !previewDaysInPreviousAndMonth {
+                return
+            }
             
             if panGR.state == .began {
                 switch dayView.rangeSelection {
@@ -458,6 +494,7 @@ extension DTCalendarView: UICollectionViewDataSource {
                 weekViewCell.selectionEndDate = selectionEndDate
                 weekViewCell.displayMonth = date
                 weekViewCell.displayWeek = indexPath.item - 1
+                weekViewCell.previewDaysInPreviousAndMonth = previewDaysInPreviousAndMonth
                 
                 weekViewCell.updateCalendarLabels(weekDisplayAttributes: weekDisplayAttributes)
             }
@@ -484,6 +521,35 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
         }
         
         return CGSize(width: collectionView.bounds.size.width, height: height)
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        
+        if paginateMonths {
+            let section = Int(floor((scrollView.contentOffset.y + pageSize / 2.0) / pageSize))
+            sectionAtStartOfScrolling = section
+        }
+    }
+    
+    public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        
+        if paginateMonths {
+            let targetSection = Int(floor((targetContentOffset.pointee.y  + pageSize / 2.0) / pageSize))
+        
+            if let currentSection = sectionAtStartOfScrolling {
+                var section = currentSection
+                if currentSection < targetSection {
+                    section += 1
+                } else if currentSection > targetSection {
+                    section -= 1
+                }
+            
+                if let currentSectionAttributes = collectionView.layoutAttributesForItem(at: IndexPath(item: 0, section: section)) {
+                    targetContentOffset.pointee = CGPoint(x: targetContentOffset.pointee.x, y: currentSectionAttributes.frame.origin.y)
+                    sectionAtStartOfScrolling = nil
+                }
+            }
+        }
     }
 }
 
@@ -514,7 +580,6 @@ extension DTCalendarView: UIGestureRecognizerDelegate {
 extension DTCalendarView: DTCalendarWeekCellDelegate {
     
     func calendarWeekCell(_ calendarWeekCell: DTCalendarWeekCell, didTapDate date: Date) {
-        
         delegate?.calendarView(self, didSelectDate: date)
     }
 }
