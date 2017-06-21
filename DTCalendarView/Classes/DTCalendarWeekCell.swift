@@ -75,8 +75,11 @@ class DTCalendarWeekCell: UICollectionViewCell {
         let leadingExtra = floor(leftOverWidth / 2)
         let trailingExtra = leftOverWidth - leadingExtra
         
-        leadInSelectionView.frame = CGRect(x: 0, y: 0, width: 20 + leadingExtra, height: height)
-        leadOutSelectionView.frame = CGRect(x:width-20-trailingExtra, y:0, width: 20+trailingExtra, height: height)
+        let leadInFrame = CGRect(x: 0, y: 0, width: 20 + leadingExtra, height: height).insetBy(dx: 0, dy: height > widthAvailablePerDay ? (height - widthAvailablePerDay) / 2 : 0)
+        leadInSelectionView.frame = leadInFrame
+        
+        let leadOutFrame = CGRect(x:width-20-trailingExtra, y:0, width: 20+trailingExtra, height: height).insetBy(dx: 0, dy: height > widthAvailablePerDay ? (height - widthAvailablePerDay) / 2 : 0)
+        leadOutSelectionView.frame = leadOutFrame
         
         for (index, dayView) in dayViews.enumerated() {
             

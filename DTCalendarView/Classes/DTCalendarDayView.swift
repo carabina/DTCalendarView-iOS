@@ -73,7 +73,8 @@ class DTCalendarDayView: UIView {
         let insetFrame = selectedLayer.frame.insetBy(dx: width > height ? (width - height) / 2 : 0, dy: height > width ? (height - width) / 2 : 0)
         selectedLayer.path = CGPath(ellipseIn: insetFrame, transform: nil)
         
-        highLightLayer.frame = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height)
+        let hightLightFrame = dayLabel.frame.insetBy(dx: 0, dy: height > width ? (height - width) / 2 : 0)
+        highLightLayer.frame = hightLightFrame
         
         super.layoutSubviews()
     }

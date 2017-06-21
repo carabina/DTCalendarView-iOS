@@ -100,7 +100,7 @@ extension ViewController: DTCalendarViewDelegate {
     }
     
     func calendarViewHeightOfWeekRows(_ calendarView: DTCalendarView) -> CGFloat {
-        return 40
+        return 60
     }
     
     func calendarViewHeightOfWeekdayLabelRow(_ calendarView: DTCalendarView) -> CGFloat {
