@@ -171,21 +171,21 @@ public class DTCalendarView: UIView {
     /// The day/month/year the calendar range selection starts at - also could be used for single selection - defaults to nil
     public var selectionStartDate: Date? {
         didSet {
-            setNeedsDisplay()
+            setNeedsUpdate()
         }
     }
     
     /// The day/month/year the calendar range selection end at - defaults to nil
     public var selectionEndDate: Date? {
         didSet {
-            setNeedsDisplay()
+            setNeedsUpdate()
         }
     }
     
     /// Should the calendar include days from the previous/next months in the current months to fill out complete weeks
     public var previewDaysInPreviousAndMonth = true {
         didSet {
-            setNeedsDisplay()
+            setNeedsUpdate()
         }
     }
     
@@ -220,7 +220,7 @@ public class DTCalendarView: UIView {
                                                             backgroundColor: .white,
                                                             textAlignment: .center) {
         didSet {
-            setNeedsDisplay()
+            setNeedsUpdate()
         }
     }
     
@@ -315,10 +315,6 @@ public class DTCalendarView: UIView {
         super.layoutSubviews()
     }
     
-    override public func draw(_ rect: CGRect) {
-        reloadVisibleCells()
-    }
-    
     /**
      Set the display attributes for the given date state
      
@@ -350,7 +346,21 @@ public class DTCalendarView: UIView {
                                                       highlightedDisplayAttributes: highlightedDisplayAttributes,
                                                       previewDisplayAttributes: previewDisplayAttributes)
         
-        setNeedsDisplay()
+        setNeedsUpdate()
+    }
+    
+    /**
+     The text to use for the weekday labels
+     
+     -parameters labels: An array with the text labels, this must be an array with 7 values in order Sun-Sat
+     
+     */
+    public func setWeekdayLabels(_ labels: [String]) {
+        if labels.count != 7 {
+            fatalError("It is a programmer error to provide more or less than 7 weekday label values")
+        }
+        
+        weekdayLabels = labels
     }
     
     fileprivate func reloadVisibleCells() {
@@ -409,12 +419,16 @@ public class DTCalendarView: UIView {
                 if panMode == .start {
                     
                     if let startDate = selectionStartDate {
-                        delegate?.calendarView(self, dragFromDate: startDate, toDate: dayView.representedDate)
+                        if startDate != dayView.representedDate {
+                            delegate?.calendarView(self, dragFromDate: startDate, toDate: dayView.representedDate)
+                        }
                     }
                 } else if panMode == .end {
                     
                     if let endDate = selectionEndDate {
-                        delegate?.calendarView(self, dragFromDate: endDate, toDate: dayView.representedDate)
+                        if endDate != dayView.representedDate {
+                            delegate?.calendarView(self, dragFromDate: endDate, toDate: dayView.representedDate)
+                        }
                     }
                 }
             }
@@ -422,18 +436,15 @@ public class DTCalendarView: UIView {
         
     }
     
-    /**
-     The text to use for the weekday labels
-     
-     -parameters labels: An array with the text labels, this must be an array with 7 values in order Sun-Sat
-     
-    */
-    public func setWeekdayLabels(_ labels: [String]) {
-        if labels.count != 7 {
-            fatalError("It is a programmer error to provide more or less than 7 weekday label values")
+    private var needsUpdate = false
+    private func setNeedsUpdate() {
+        if !needsUpdate {
+            needsUpdate = true
+            DispatchQueue.main.async { [weak self] in
+                self?.needsUpdate = false
+                self?.reloadVisibleCells()
+            }
         }
-        
-        weekdayLabels = labels
     }
 }
 
@@ -482,7 +493,6 @@ extension DTCalendarView: UICollectionViewDataSource {
                     count -= 1
                 }
             }
-
             
             return count
         }
