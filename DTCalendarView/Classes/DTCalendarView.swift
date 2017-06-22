@@ -227,11 +227,16 @@ public class DTCalendarView: UIView {
     fileprivate var collectionViewFlowLayout: UICollectionViewFlowLayout
     fileprivate var collectionView: UICollectionView
     
+    /// The pan gesture recogizer for dragging start/end date
     fileprivate var datePanGR: UIPanGestureRecognizer?
+    
+    /// The pan mode - dragging start or end date or none
     fileprivate var panMode = PanMode.none
     
+    /// The section (month/year) the calendar was at when the user started scrolling
     fileprivate var sectionAtStartOfScrolling: Int?
     
+    /// Internal representation of the calendar start date the user set - pins to first day of month for calculations
     private var _startDate: Date = {
         let calendar = Calendar.current
         let date = Date()
@@ -247,6 +252,7 @@ public class DTCalendarView: UIView {
         }
     }
 
+    /// Internal representation of the calendar end date the user set - pins to first day of month for calculations
     private var _endDate: Date = {
         let calendar = Calendar.current
         let date = Date()
@@ -348,6 +354,7 @@ public class DTCalendarView: UIView {
     }
     
     fileprivate func reloadVisibleCells() {
+        /// Disable implicit layer animations
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
@@ -379,8 +386,11 @@ public class DTCalendarView: UIView {
         
         let point = panGR.location(in: collectionView)
         
+        /// Is the user over the day of a calendar?
         if let dayView = collectionView.hitTest(point, with: nil) as? DTCalendarDayView {
             
+            /// Is that day outside of the current month and we aren't showing those
+            /// Then ignore
             if dayView.isPreview && !previewDaysInPreviousAndMonth {
                 return
             }
@@ -431,6 +441,8 @@ extension DTCalendarView: UICollectionViewDataSource {
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
         
+        /// Each section of the collection view represents a month
+        /// with rows representing the month/year view, the days of the week, and a full calendar week
         let calendar = Calendar.current
         let months = calendar.dateComponents([.month], from: displayStartDate, to: displayEndDate).month ?? 0
         
@@ -441,10 +453,15 @@ extension DTCalendarView: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         if previewDaysInPreviousAndMonth {
+            /// If showing days outside the current month
+            /// The month section always has 8 rows - 6 for the weeks, one for the month/year view, and one for the day of week labels
             return 8
         } else {
             var count = 8
             
+            /// If not we need to determine if the month will fit in less than 6 displayed weeks
+            /// If so determine if this falls at the end or beginning of the month (or both Feb 2015!)
+            /// And subtract that week out of the total count
             let calendar = Calendar.current
             if let date = calendar.date(byAdding: .month, value: section, to: displayStartDate),
                 let range = calendar.range(of: .day, in: .month, for: date),
@@ -475,6 +492,7 @@ extension DTCalendarView: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         if indexPath.item == 0 {
+            /// Cell for the month/year view
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MonthViewCell", for: indexPath)
             let calendar = Calendar.current
             if let date = calendar.date(byAdding: .month, value: indexPath.section, to: displayStartDate),
@@ -484,6 +502,7 @@ extension DTCalendarView: UICollectionViewDataSource {
             }
             return cell
         } else if indexPath.item == 1 {
+            /// Cell for the week day labels
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "WeekDayViewCell", for: indexPath)
             
             if let weekdayViewCell = cell as? DTWeekdayViewCell {
@@ -493,9 +512,11 @@ extension DTCalendarView: UICollectionViewDataSource {
             
             return cell
         } else {
+            /// Cell for a week
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier:  "WeekViewCell", for: indexPath)
             
             let calendar = Calendar.current
+            
             if let date = calendar.date(byAdding: .month, value: indexPath.section, to: displayStartDate),
                 let weekViewCell = cell as? DTCalendarWeekCell,
                 var weekday = calendar.dateComponents([.weekday], from: date).weekday {
@@ -507,8 +528,13 @@ extension DTCalendarView: UICollectionViewDataSource {
                 let indexOfLastDayOfWeekInFirstWeek = 6
                 
                 var displayWeek = indexPath.item - 1
-                if indexOfLastDayOfWeekInFirstWeek < weekday - 1 {
-                    displayWeek += 1
+                
+                /// If we aren't showing days outside the current month
+                /// And the first week was drop we need to shift the display week up by 1
+                if !previewDaysInPreviousAndMonth {
+                    if indexOfLastDayOfWeekInFirstWeek < weekday - 1 {
+                        displayWeek += 1
+                    }
                 }
                 
                 weekViewCell.delegate = self
@@ -546,6 +572,7 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
         
         if paginateMonths {
             
+            /// If we are paginating months determine the starting sections when scrolling starts
             let targetDivided = CGRect(origin: scrollView.contentOffset, size: scrollView.bounds.size).divided(atDistance: scrollView.bounds.size.height / 3, from: .minYEdge)
             
             if let layoutAttributes = collectionViewFlowLayout.layoutAttributesForElements(in: targetDivided.remainder) {
@@ -565,11 +592,15 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
             var targetSection = sectionAtStartOfScrolling ?? 0
             
             if velocity.y > 0.25 {
+                /// If there is significant forward velocity go to next month
                 targetSection += 1
             } else if velocity.y < -0.25 {
+                /// If there is significant backwards velocity go to previous month
                 targetSection -= 1
             } else {
             
+                /// If the velocity is low find a region in the center of the visible rect based on the target content offset
+                /// And determine which section the cells in that area belong to and use that to determine which month to land on
                 let targetRect = CGRect(x: targetContentOffset.pointee.x,
                                         y: targetContentOffset.pointee.y + (scrollView.bounds.size.height / 2) - (scrollView.bounds.size.height / 20),
                                         width: scrollView.bounds.size.width,
@@ -588,6 +619,8 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
             
             if let currentSection = sectionAtStartOfScrolling {
                 var section = currentSection
+                
+                /// If paginating only always to go one page at a time
                 if currentSection < targetSection {
                     section += 1
                 } else if currentSection > targetSection {
@@ -607,6 +640,8 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
 
 extension DTCalendarView: UIGestureRecognizerDelegate {
     
+    /// This ensures that a selected date (start or end) gets the pan if on it
+    /// But the scrollview gets it other wise
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         
         guard let datePanGR = datePanGR else { return true }
