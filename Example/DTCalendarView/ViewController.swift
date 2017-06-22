@@ -17,6 +17,7 @@ class ViewController: UIViewController {
             
             calendarView.displayEndDate = Date(timeIntervalSinceNow: 60 * 60 * 24 * 30 * 12 * 2)
             calendarView.previewDaysInPreviousAndMonth = true
+            calendarView.paginateMonths = true
         }
     }
     
@@ -99,15 +100,15 @@ extension ViewController: DTCalendarViewDelegate {
         }
     }
     
-    func calendarViewHeightOfWeekRows(_ calendarView: DTCalendarView) -> CGFloat {
+    func calendarViewHeightForWeekRows(_ calendarView: DTCalendarView) -> CGFloat {
         return 60
     }
     
-    func calendarViewHeightOfWeekdayLabelRow(_ calendarView: DTCalendarView) -> CGFloat {
+    func calendarViewHeightForWeekdayLabelRow(_ calendarView: DTCalendarView) -> CGFloat {
         return 50
     }
     
-    func calendarView(_ calendarView: DTCalendarView, heightOfViewForMonth month: Date) -> CGFloat {
+    func calendarViewHeightForMonthView(_ calendarView: DTCalendarView) -> CGFloat {
         return 60
     }
 }

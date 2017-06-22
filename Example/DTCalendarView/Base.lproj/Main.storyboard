@@ -6,7 +6,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -23,10 +22,10 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4yM-Ee-NJu" customClass="DTCalendarView" customModule="DTCalendarView">
-                                <rect key="frame" x="0.0" y="128" width="375" height="412.5"/>
+                                <rect key="frame" x="0.0" y="104.5" width="375" height="460"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" secondItem="4yM-Ee-NJu" secondAttribute="height" multiplier="1:1.1" id="AvR-wV-nAn"/>
+                                    <constraint firstAttribute="height" constant="460" id="4bE-yW-XEM"/>
                                 </constraints>
                             </view>
                         </subviews>

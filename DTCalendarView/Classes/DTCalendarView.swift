@@ -51,16 +51,14 @@ public protocol DTCalendarViewDelegate: class {
     
     
     /**
-     Asks your delegate for the height used to display the view representing the month/year above the weeks of a month
+     Asks your delegate for the height used to display the view representing the months/years above the weeks of a month
      
      - parameter calendarView: The calendar view requesting the view
-     
-     - parameter month: A date representing the month/year the height should be for, othe Date data should be ignored - like the particular day
      
      - returns the height used the diplay the view
      
     */
-    func calendarView(_ calendarView: DTCalendarView, heightOfViewForMonth month: Date) -> CGFloat
+    func calendarViewHeightForMonthView(_ calendarView: DTCalendarView) -> CGFloat
     
     /**
      Asks your delegate for the height used to display the view containing the weekday labels
@@ -70,7 +68,7 @@ public protocol DTCalendarViewDelegate: class {
      - returns the height used the diplay the view
      
      */
-    func calendarViewHeightOfWeekRows(_ calendarView: DTCalendarView) -> CGFloat
+    func calendarViewHeightForWeekRows(_ calendarView: DTCalendarView) -> CGFloat
     
     /**
      Asks your delegate for the height used to display the view containing the weeks of the month
@@ -80,7 +78,7 @@ public protocol DTCalendarViewDelegate: class {
      - returns the height used the diplay the view
      
      */
-    func calendarViewHeightOfWeekdayLabelRow(_ calendarView: DTCalendarView) -> CGFloat
+    func calendarViewHeightForWeekdayLabelRow(_ calendarView: DTCalendarView) -> CGFloat
 }
 
 
@@ -192,12 +190,7 @@ public class DTCalendarView: UIControl {
     }
     
     /// Should the calendar scroll be paginated and always lock to the top of a month
-    public var paginateMonths = true {
-        didSet {
-            collectionViewSectionInsetSet = false
-            setNeedsLayout()
-        }
-    }
+    public var paginateMonths = true
     
     /// A delegate to provide required data to the calendar view and respond to user interaction with the calendar view
     public weak var delegate: DTCalendarViewDelegate?
@@ -231,15 +224,13 @@ public class DTCalendarView: UIControl {
         }
     }
     
-    private var collectionViewFlowLayout: UICollectionViewFlowLayout
+    fileprivate var collectionViewFlowLayout: UICollectionViewFlowLayout
     fileprivate var collectionView: UICollectionView
     
     fileprivate var datePanGR: UIPanGestureRecognizer?
     fileprivate var panMode = PanMode.none
     
     fileprivate var sectionAtStartOfScrolling: Int?
-    fileprivate var pageSize: CGFloat = 0
-    fileprivate var collectionViewSectionInsetSet = false
     
     private var _startDate: Date = {
         let calendar = Calendar.current
@@ -314,24 +305,6 @@ public class DTCalendarView: UIControl {
     override public func layoutSubviews() {
         
         collectionView.frame = CGRect(x: 0, y: 0, width: bounds.size.width, height: bounds.size.height)
-        
-        if !collectionViewSectionInsetSet {
-            collectionViewSectionInsetSet = true
-            
-            if paginateMonths {
-                let monthHeight = delegate?.calendarView(self, heightOfViewForMonth: displayStartDate) ?? 60
-                var height = monthHeight
-                height += delegate?.calendarViewHeightOfWeekdayLabelRow(self) ?? 50
-                height += (delegate?.calendarViewHeightOfWeekRows(self) ?? 40) * 6
-                
-                let bottomInset = max(collectionView.frame.size.height - (height + monthHeight), 0)
-            
-                pageSize = height + bottomInset
-                collectionViewFlowLayout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: bottomInset, right: 0)
-            } else {
-                collectionViewFlowLayout.sectionInset = .zero
-            }
-        }
         
         super.layoutSubviews()
     }
@@ -466,7 +439,38 @@ extension DTCalendarView: UICollectionViewDataSource {
     
     @available(iOS 6.0, *)
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 8
+        
+        if previewDaysInPreviousAndMonth {
+            return 8
+        } else {
+            var count = 8
+            
+            let calendar = Calendar.current
+            if let date = calendar.date(byAdding: .month, value: section, to: displayStartDate),
+                let range = calendar.range(of: .day, in: .month, for: date),
+                var weekday = calendar.dateComponents([.weekday], from: date).weekday {
+                
+                if weekday == 1 {
+                    weekday = 8
+                }
+                
+                let indexOfLastDayOfWeekInFirstWeek = 6
+                let indexOfFirstDayOfWeekInLastWeek = 35
+                
+                if indexOfLastDayOfWeekInFirstWeek < weekday - 1 {
+                    print("first:\(date)")
+                    count -= 1
+                }
+                
+                if indexOfFirstDayOfWeekInLastWeek >= (range.count + weekday - 1) {
+                    print("last:\(date)")
+                    count -= 1
+                }
+            }
+
+            
+            return count
+        }
     }
     
     @available(iOS 6.0, *)
@@ -495,12 +499,25 @@ extension DTCalendarView: UICollectionViewDataSource {
             
             let calendar = Calendar.current
             if let date = calendar.date(byAdding: .month, value: indexPath.section, to: displayStartDate),
-                let weekViewCell = cell as? DTCalendarWeekCell {
+                let weekViewCell = cell as? DTCalendarWeekCell,
+                var weekday = calendar.dateComponents([.weekday], from: date).weekday {
+                    
+                if weekday == 1 {
+                    weekday = 8
+                }
+                    
+                let indexOfLastDayOfWeekInFirstWeek = 6
+                
+                var displayWeek = indexPath.item - 1
+                if indexOfLastDayOfWeekInFirstWeek < weekday - 1 {
+                    displayWeek += 1
+                }
+                
                 weekViewCell.delegate = self
                 weekViewCell.selectionStartDate = selectionStartDate
                 weekViewCell.selectionEndDate = selectionEndDate
                 weekViewCell.displayMonth = date
-                weekViewCell.displayWeek = indexPath.item - 1
+                weekViewCell.displayWeek = displayWeek
                 weekViewCell.previewDaysInPreviousAndMonth = previewDaysInPreviousAndMonth
                 
                 weekViewCell.updateCalendarLabels(weekDisplayAttributes: weekDisplayAttributes)
@@ -517,14 +534,11 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
         
         var height: CGFloat = 0
         if indexPath.item == 0 {
-            let calendar = Calendar.current
-            if let date = calendar.date(byAdding: .month, value: indexPath.section, to: displayStartDate) {
-                height = delegate?.calendarView(self, heightOfViewForMonth: date) ?? 60
-            }
+            height = delegate?.calendarViewHeightForMonthView(self) ?? 60
         } else if indexPath.item == 1 {
-            height = delegate?.calendarViewHeightOfWeekdayLabelRow(self) ?? 50
+            height = delegate?.calendarViewHeightForWeekdayLabelRow(self) ?? 50
         } else {
-            height = delegate?.calendarViewHeightOfWeekRows(self) ?? 40
+            height = delegate?.calendarViewHeightForWeekRows(self) ?? 40
         }
         
         return CGSize(width: collectionView.bounds.size.width, height: height)
@@ -533,16 +547,37 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         
         if paginateMonths {
-            let section = Int(floor((scrollView.contentOffset.y + pageSize / 2.0) / pageSize))
-            sectionAtStartOfScrolling = section
+            
+            let targetDivided = CGRect(origin: scrollView.contentOffset, size: scrollView.bounds.size).divided(atDistance: scrollView.bounds.size.height / 3, from: .minYEdge)
+            
+            if let layoutAttributes = collectionViewFlowLayout.layoutAttributesForElements(in: targetDivided.remainder) {
+                if layoutAttributes.count > 0 {
+                    if let indexPath = collectionView.indexPathForItem(at: layoutAttributes[0].frame.origin) {
+                        sectionAtStartOfScrolling = indexPath.section
+                    }
+                }
+            }
         }
     }
     
     public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         
         if paginateMonths {
-            let targetSection = Int(floor((targetContentOffset.pointee.y  + pageSize / 2.0) / pageSize))
-        
+            
+            var targetSection = sectionAtStartOfScrolling ?? 0
+            
+            let targetDivided = CGRect(origin: targetContentOffset.pointee, size: scrollView.bounds.size).divided(atDistance: scrollView.bounds.size.height / 2, from: .minYEdge)
+            
+            if let layoutAttributes = collectionViewFlowLayout.layoutAttributesForElements(in: targetDivided.remainder) {
+                if layoutAttributes.count > 0 {
+                    let layoutAttributeToUse = layoutAttributes[0]
+                
+                    if let indexPath = collectionView.indexPathForItem(at: layoutAttributeToUse.frame.origin) {
+                        targetSection = indexPath.section
+                    }
+                }
+            }
+            
             if let currentSection = sectionAtStartOfScrolling {
                 var section = currentSection
                 if currentSection < targetSection {
