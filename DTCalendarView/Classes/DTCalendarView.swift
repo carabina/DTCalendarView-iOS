@@ -136,7 +136,7 @@ private enum PanMode {
 
 
 /// A class for displaying a vertical scrolling calendar view. Supports selecting a range of dates and dragging those days around
-public class DTCalendarView: UIControl {
+public class DTCalendarView: UIView {
     
     /// The month/year the calendar should start at - defaults to current month/year. Other Date attributes are ignored (day, hour, etc)
     public var displayStartDate: Date {
@@ -458,12 +458,10 @@ extension DTCalendarView: UICollectionViewDataSource {
                 let indexOfFirstDayOfWeekInLastWeek = 35
                 
                 if indexOfLastDayOfWeekInFirstWeek < weekday - 1 {
-                    print("first:\(date)")
                     count -= 1
                 }
                 
                 if indexOfFirstDayOfWeekInLastWeek >= (range.count + weekday - 1) {
-                    print("last:\(date)")
                     count -= 1
                 }
             }
@@ -566,14 +564,24 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
             
             var targetSection = sectionAtStartOfScrolling ?? 0
             
-            let targetDivided = CGRect(origin: targetContentOffset.pointee, size: scrollView.bounds.size).divided(atDistance: scrollView.bounds.size.height / 2, from: .minYEdge)
+            if velocity.y > 0.25 {
+                targetSection += 1
+            } else if velocity.y < -0.25 {
+                targetSection -= 1
+            } else {
             
-            if let layoutAttributes = collectionViewFlowLayout.layoutAttributesForElements(in: targetDivided.remainder) {
-                if layoutAttributes.count > 0 {
-                    let layoutAttributeToUse = layoutAttributes[0]
+                let targetRect = CGRect(x: targetContentOffset.pointee.x,
+                                        y: targetContentOffset.pointee.y + (scrollView.bounds.size.height / 2) - (scrollView.bounds.size.height / 20),
+                                        width: scrollView.bounds.size.width,
+                                        height: scrollView.bounds.size.height / 10)
                 
-                    if let indexPath = collectionView.indexPathForItem(at: layoutAttributeToUse.frame.origin) {
-                        targetSection = indexPath.section
+                if let layoutAttributes = collectionViewFlowLayout.layoutAttributesForElements(in: targetRect) {
+                    if layoutAttributes.count > 0 {
+                        let layoutAttributeToUse = layoutAttributes[0]
+                
+                        if let indexPath = collectionView.indexPathForItem(at: layoutAttributeToUse.frame.origin) {
+                            targetSection = indexPath.section
+                        }
                     }
                 }
             }
@@ -585,10 +593,12 @@ extension DTCalendarView: UICollectionViewDelegateFlowLayout {
                 } else if currentSection > targetSection {
                     section -= 1
                 }
-            
-                if let currentSectionAttributes = collectionView.layoutAttributesForItem(at: IndexPath(item: 0, section: section)) {
-                    targetContentOffset.pointee = CGPoint(x: targetContentOffset.pointee.x, y: currentSectionAttributes.frame.origin.y)
-                    sectionAtStartOfScrolling = nil
+                
+                if section >= 0 && section < collectionView.numberOfSections {
+                    if let currentSectionAttributes = collectionView.layoutAttributesForItem(at: IndexPath(item: 0, section: section)) {
+                        targetContentOffset.pointee = CGPoint(x: targetContentOffset.pointee.x, y: currentSectionAttributes.frame.origin.y)
+                        sectionAtStartOfScrolling = nil
+                    }
                 }
             }
         }

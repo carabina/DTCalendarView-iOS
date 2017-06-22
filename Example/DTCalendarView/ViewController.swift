@@ -16,7 +16,7 @@ class ViewController: UIViewController {
             calendarView.delegate = self
             
             calendarView.displayEndDate = Date(timeIntervalSinceNow: 60 * 60 * 24 * 30 * 12 * 2)
-            calendarView.previewDaysInPreviousAndMonth = true
+            calendarView.previewDaysInPreviousAndMonth = false
             calendarView.paginateMonths = true
         }
     }
