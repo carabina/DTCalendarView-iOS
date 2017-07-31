@@ -23,11 +23,11 @@ It supports single value and range selection and dragging of selected dates.
 The font and color of most items can be styled.
                        DESC
 
-  s.homepage         = 'https://stash.dynamit.com/projects/MOB/repos/dtcalendarview/browse'
+  s.homepage         = 'https://github.com/Dynamit/DTCalendarView-iOS'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Tim LeMaster' => 'tim@dynamit.com' }
-  s.source           = { :git => 'ssh://git@stash.dynamit.com/mob/dtcalendarview.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/Dynamit/DTCalendarView-iOS.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '8.0'
 
